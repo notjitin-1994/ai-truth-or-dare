@@ -1,3 +1,6 @@
+// Kimi API Configuration
+export const KIMI_API_URL = 'https://api.kimi.com/v1/chat/completions';
+
 // Utility to get API key from various sources
 export function getApiKey() {
   // Try environment variable first (normal case)
@@ -8,9 +11,9 @@ export function getApiKey() {
   const alternatives = [
     process.env.KIMI_API_KEY,
     process.env.VERCEL_KIMI_API_KEY,
-    process.env.NEXT_PUBLIC_KIMI_API_KEY,  // Sometimes users mistakenly use NEXT_PUBLIC
+    process.env.NEXT_PUBLIC_KIMI_API_KEY,
     process.env.KIMI_KEY,
-    process.env.OPENAI_API_KEY,  // Some users might use this name
+    process.env.OPENAI_API_KEY,
   ];
   
   for (const key of alternatives) {

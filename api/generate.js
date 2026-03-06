@@ -1,7 +1,5 @@
 // Vercel Serverless Function for AI generation
-import { getApiKey, findPotentialApiKeys } from './_utils.js';
-
-const KIMI_CODE_API_URL = 'https://api.kimi.com/v1/chat/completions';
+import { getApiKey, findPotentialApiKeys, KIMI_API_URL } from './_utils.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -38,7 +36,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const response = await fetch(KIMI_CODE_API_URL, {
+    const response = await fetch(KIMI_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,9 +52,11 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Kimi API Error:', response.status, errorText);
       return res.status(response.status).json({ 
         error: `Kimi API error: ${response.status}`,
-        details: errorText 
+        url: KIMI_API_URL,
+        details: errorText.substring(0, 500)
       });
     }
 
