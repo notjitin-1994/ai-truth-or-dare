@@ -22,13 +22,23 @@ export default async function handler(req, res) {
     const apiKey = process.env.KIMI_API_KEY?.trim();
 
     if (!apiKey) {
-      console.error('KIMI_API_KEY is not set or empty. Available env keys:', 
-        Object.keys(process.env).filter(k => k.includes('KIMI') || k.includes('API'))
-      );
+      const allKeys = Object.keys(process.env);
+      const kimiRelated = allKeys.filter(k => k.toLowerCase().includes('kimi'));
+      
+      console.error('DEBUG: KIMI_API_KEY not found');
+      console.error('DEBUG: All env var keys:', allKeys);
+      console.error('DEBUG: Kimi-related keys:', kimiRelated);
+      
       return res.status(401).json({ 
         success: false,
         error: 'KIMI_API_KEY environment variable not set',
-        hint: 'Please set KIMI_API_KEY in your Vercel project settings under Environment Variables'
+        debug: {
+          kimi_related_keys_found: kimiRelated,
+          total_env_vars: allKeys.length,
+          vercel_env: process.env.VERCEL_ENV,
+          node_env: process.env.NODE_ENV,
+        },
+        hint: 'Please set KIMI_API_KEY in Vercel Dashboard > Project Settings > Environment Variables. Then REDEPLOY.'
       });
     }
 
