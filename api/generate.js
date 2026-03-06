@@ -1,5 +1,6 @@
 // Vercel Serverless Function for AI generation
-// Kimi API endpoint - using OpenAI-compatible endpoint
+import { getApiKey, findPotentialApiKeys } from './_utils.js';
+
 const KIMI_CODE_API_URL = 'https://api.kimi.com/v1/chat/completions';
 
 export default async function handler(req, res) {
@@ -19,22 +20,21 @@ export default async function handler(req, res) {
 
   try {
     const { messages, model, temperature, max_tokens } = req.body;
-    // Trim the API key to handle any accidental whitespace
-    const apiKey = process.env.KIMI_API_KEY?.trim();
+    // Get API key using utility (tries multiple sources)
+    const apiKey = getApiKey();
 
     if (!apiKey) {
-      const allKeys = Object.keys(process.env);
-      const kimiRelated = allKeys.filter(k => k.toLowerCase().includes('kimi'));
+      const potentialKeys = findPotentialApiKeys();
       
       return res.status(401).json({ 
         error: 'KIMI_API_KEY environment variable not set',
         debug: {
-          kimi_related_keys_found: kimiRelated,
-          total_env_vars: allKeys.length,
+          potential_api_keys_found: potentialKeys,
+          total_env_vars: Object.keys(process.env).length,
           vercel_env: process.env.VERCEL_ENV,
           node_env: process.env.NODE_ENV,
         },
-        hint: 'Please set KIMI_API_KEY in Vercel Dashboard > Project Settings > Environment Variables. Then REDEPLOY.'
+        hint: '1. Go to Vercel Dashboard > Project Settings > Environment Variables\n2. Add KIMI_API_KEY with value starting with sk-kimi-\n3. Make sure Production environment is SELECTED\n4. Click REDEPLOY (not just rebuild)'
       });
     }
 

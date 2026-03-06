@@ -1,4 +1,6 @@
 // Config endpoint to verify env var setup
+import { getApiKey, findPotentialApiKeys } from './_utils.js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -8,37 +10,33 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Get all environment variables that might be related
-  const allEnvVars = Object.keys(process.env);
-  
-  // Look for any variations of the API key name
-  const possibleKeyNames = allEnvVars.filter(key => 
-    key.toLowerCase().includes('kimi') || 
-    key.toLowerCase().includes('api') ||
-    key.toLowerCase().includes('key')
-  );
-
-  // Check the exact KIMI_API_KEY
-  const kimiKey = process.env.KIMI_API_KEY;
+  const apiKey = getApiKey();
+  const potentialKeys = findPotentialApiKeys();
   
   res.json({
-    kimi_api_key: {
-      exists: !!kimiKey,
-      length: kimiKey ? kimiKey.length : 0,
-      starts_with_sk: kimiKey ? kimiKey.startsWith('sk-') : false,
-      first_10_chars: kimiKey ? kimiKey.substring(0, 10) + '...' : null,
-      trimmed_exists: !!(kimiKey && kimiKey.trim()),
-      trimmed_length: kimiKey ? kimiKey.trim().length : 0,
+    api_key_status: {
+      found: !!apiKey,
+      source: apiKey ? (process.env.KIMI_API_KEY ? 'KIMI_API_KEY' : 'alternative') : null,
+      length: apiKey ? apiKey.length : 0,
+      starts_with_sk: apiKey ? apiKey.startsWith('sk-') : false,
+      preview: apiKey ? apiKey.substring(0, 15) + '...' : null,
     },
-    possible_env_vars: possibleKeyNames,
-    all_env_var_count: allEnvVars.length,
-    vercel_specific: {
+    potential_env_vars: potentialKeys,
+    vercel_info: {
       VERCEL: process.env.VERCEL,
       VERCEL_ENV: process.env.VERCEL_ENV,
       VERCEL_URL: process.env.VERCEL_URL,
       VERCEL_REGION: process.env.VERCEL_REGION,
     },
     node_env: process.env.NODE_ENV,
-    timestamp: Date.now(),
+    timestamp: new Date().toISOString(),
+    fix_instructions: [
+      "1. Go to https://vercel.com/jitin-nairs-projects/ai-truth-or-dare/settings/environment-variables",
+      "2. Check if KIMI_API_KEY exists with value starting with 'sk-kimi-'",
+      "3. If it exists, DELETE it and RE-ADD it",
+      "4. Make sure 'Production' checkbox is SELECTED",
+      "5. Save and REDEPLOY the project",
+      "6. If still not working, try adding to 'Preview' environment too"
+    ]
   });
 }
