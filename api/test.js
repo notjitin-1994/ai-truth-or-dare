@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   try {
     const apiKey = getApiKey();
     
-    console.log('Test API Key check:', apiKey ? 'Found' : 'Not found');
+    console.log('Test API Key check:', apiKey ? `Found (${apiKey.length} chars)` : 'Not found');
 
     if (!apiKey) {
       const potentialKeys = findPotentialApiKeys();
@@ -37,44 +37,74 @@ export default async function handler(req, res) {
 
     // Use Kimi-specific headers to identify as coding agent
     const headers = getKimiHeaders(apiKey);
+    
+    console.log('Request headers:', JSON.stringify(headers, null, 2));
+    console.log('Request URL:', KIMI_API_URL);
+
+    const requestBody = {
+      model: 'kimi-for-coding',
+      messages: [
+        { role: 'user', content: 'Say "Connection successful" and nothing else.' }
+      ],
+      max_tokens: 50,
+    };
+    
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(KIMI_API_URL, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        model: 'kimi-for-coding',
-        messages: [
-          { role: 'user', content: 'Say "Connection successful" and nothing else.' }
-        ],
-        max_tokens: 50,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', JSON.stringify(Object.fromEntries(response.headers), null, 2));
+
+    const responseText = await response.text();
+    console.log('Response body (raw):', responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Kimi API Error:', response.status, errorText);
+      console.error('Kimi API Error:', response.status, responseText);
       return res.status(response.status).json({ 
         success: false,
         error: `Kimi API error: ${response.status}`,
         url: KIMI_API_URL,
-        details: errorText.substring(0, 500)
+        response_body: responseText,
       });
     }
 
-    const data = await response.json();
+    // Try to parse as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+      console.log('Parsed response:', JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.error('Failed to parse response as JSON:', e);
+      return res.json({
+        success: false,
+        error: 'Invalid JSON response',
+        raw_response: responseText,
+      });
+    }
+    
     const content = data.choices?.[0]?.message?.content;
     
     if (content) {
-      res.json({ success: true, message: 'Connection successful! AI is ready.' });
+      res.json({ success: true, message: content });
     } else {
-      res.json({ success: false, message: 'Empty response from API' });
+      res.json({ 
+        success: false, 
+        error: 'Empty content in response',
+        full_response: data,
+      });
     }
   } catch (error) {
     console.error('Test error:', error);
     res.status(500).json({ 
       success: false,
       error: 'Proxy server error',
-      message: error.message 
+      message: error.message,
+      stack: error.stack,
     });
   }
 }
