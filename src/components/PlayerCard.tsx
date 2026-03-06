@@ -93,19 +93,19 @@ export function PlayerCard({ player, onRemove, onUpdate, isActive = false, showD
       {isActive && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />}
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl">{genderIcons[player.gender] || '🧑'}</div>
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl sm:text-2xl flex-shrink-0">{genderIcons[player.gender] || '🧑'}</div>
             <div>
-              <h3 className="font-bold text-white text-lg">{player.name}</h3>
-              <div className="flex items-center gap-2 mt-1">
+              <h3 className="font-bold text-white text-base sm:text-lg">{player.name}</h3>
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
                 <Badge variant="outline" className={`text-xs ${relationshipColors[player.relationshipStatus]}`}><Heart className="w-3 h-3 mr-1" />{player.relationshipStatus.replace('-', ' ')}</Badge>
                 <Badge variant="outline" className="text-xs bg-slate-700/50 text-slate-300 border-slate-600 capitalize">{player.gender}</Badge>
               </div>
             </div>
           </div>
-          <div className="flex gap-1">
-            {onUpdate && <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)} className="text-slate-500 hover:text-blue-400 hover:bg-blue-500/10"><Edit2 className="w-4 h-4" /></Button>}
-            {onRemove && <Button variant="ghost" size="icon" onClick={() => onRemove(player.id)} className="text-slate-500 hover:text-red-400 hover:bg-red-500/10"><Trash2 className="w-4 h-4" /></Button>}
+          <div className="flex gap-0.5 sm:gap-1">
+            {onUpdate && <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)} className="h-8 w-8 sm:h-9 sm:w-9 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10"><Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></Button>}
+            {onRemove && <Button variant="ghost" size="icon" onClick={() => onRemove(player.id)} className="h-8 w-8 sm:h-9 sm:w-9 text-slate-500 hover:text-red-400 hover:bg-red-500/10"><Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></Button>}
           </div>
         </div>
         {showDetails && (

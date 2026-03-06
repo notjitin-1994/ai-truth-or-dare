@@ -80,13 +80,13 @@ function GameContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       <header className="border-b border-purple-500/20 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <Gamepad2 className="w-6 h-6 text-white" />
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+              <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">AI Truth or Dare</h1>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-white truncate">AI Truth or Dare</h1>
               <p className="text-xs text-slate-400">Adult Edition</p>
             </div>
           </div>
@@ -108,20 +108,20 @@ function GameContent() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {isGameActive ? (
           <div className="max-w-2xl mx-auto"><GamePlay /></div>
         ) : (
           <Tabs defaultValue="players" className="w-full">
-            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8 bg-slate-800">
-              <TabsTrigger value="players" className="data-[state=active]:bg-purple-600">
-                <Users className="w-4 h-4 mr-2" /> Players ({players.length})
+            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-6 sm:mb-8 bg-slate-800 h-auto">
+              <TabsTrigger value="players" className="data-[state=active]:bg-purple-600 text-xs sm:text-sm py-2 sm:py-2.5">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Players ({players.length})</span><span className="sm:hidden">Players</span>
               </TabsTrigger>
-              <TabsTrigger value="settings" className="data-[state=active]:bg-purple-600">
-                <Settings2 className="w-4 h-4 mr-2" /> Settings
+              <TabsTrigger value="settings" className="data-[state=active]:bg-purple-600 text-xs sm:text-sm py-2 sm:py-2.5">
+                <Settings2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> <span>Settings</span>
               </TabsTrigger>
-              <TabsTrigger value="data" className="data-[state=active]:bg-purple-600">
-                <Database className="w-4 h-4 mr-2" /> Data
+              <TabsTrigger value="data" className="data-[state=active]:bg-purple-600 text-xs sm:text-sm py-2 sm:py-2.5">
+                <Database className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> <span>Data</span>
               </TabsTrigger>
             </TabsList>
 
@@ -135,7 +135,7 @@ function GameContent() {
               )}
               {showAddPlayer && <PlayerForm onSubmit={handleAddPlayer} onCancel={() => setShowAddPlayer(false)} />}
               {players.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {players.map((player) => (
                     <PlayerCard key={player.id} player={player} onRemove={handleRemovePlayer} onUpdate={handleUpdatePlayer} />
                   ))}

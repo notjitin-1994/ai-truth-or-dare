@@ -71,7 +71,7 @@ export function PlayerForm({ onSubmit, onCancel }: PlayerFormProps) {
             <Label htmlFor="name" className="text-slate-300">Name *</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter player name" className="bg-slate-800 border-slate-600 text-white" required />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-slate-300">Gender</Label>
               <Select value={gender} onValueChange={(v) => setGender(v as Gender)}>
@@ -101,7 +101,7 @@ export function PlayerForm({ onSubmit, onCancel }: PlayerFormProps) {
           </div>
           <div className="border-t border-slate-700 pt-4">
             <p className="text-sm text-slate-400 mb-3">Physical Features (Optional)</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label className="text-slate-300 text-xs">Height</Label>
                 <Input value={height} onChange={(e) => setHeight(e.target.value)} placeholder="e.g., 5'10" className="bg-slate-800 border-slate-600 text-white text-sm" />

@@ -3,6 +3,31 @@ import type { Player, GameState, GameSettings, GeneratedQuestion, IntensityLevel
 
 const STORAGE_KEY = 'ai-truth-or-dare-game-data';
 
+// Check if localStorage is available and working
+function isLocalStorageAvailable(): boolean {
+  try {
+    const test = '__storage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Get a unique ID that works across all browsers
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const defaultSettings: GameSettings = {
   intensityLevel: 'medium' as IntensityLevel,
   allowAdultContent: true,
@@ -23,6 +48,10 @@ const initialState: GameState = {
 };
 
 function loadState(): GameState {
+  if (!isLocalStorageAvailable()) {
+    console.warn('localStorage is not available, using in-memory storage');
+    return initialState;
+  }
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -45,6 +74,9 @@ function loadState(): GameState {
 }
 
 function saveState(state: GameState) {
+  if (!isLocalStorageAvailable()) {
+    return; // Silently skip saving if localStorage is not available
+  }
   try {
     const toSave = {
       players: state.players,
@@ -52,7 +84,12 @@ function saveState(state: GameState) {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   } catch (e) {
-    console.error('Failed to save game state:', e);
+    // Handle quota exceeded error specifically
+    if (e instanceof Error && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded, unable to save game state');
+    } else {
+      console.error('Failed to save game state:', e);
+    }
   }
 }
 
@@ -175,7 +212,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const addPlayer = (player: Omit<Player, 'id' | 'createdAt'>) => {
     const newPlayer: Player = {
       ...player,
-      id: crypto.randomUUID(),
+      id: generateId(),
       createdAt: Date.now(),
     };
     dispatch({ type: 'ADD_PLAYER', payload: newPlayer });
@@ -226,7 +263,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   };
 
   const clearAllData = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    if (isLocalStorageAvailable()) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
     dispatch({ type: 'CLEAR_ALL_DATA' });
   };
 

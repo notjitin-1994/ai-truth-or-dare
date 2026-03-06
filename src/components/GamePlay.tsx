@@ -74,16 +74,20 @@ export function GamePlay() {
     setCurrentQuestion(null);
     setSelectedType(null);
     setUseAIFallback(false);
+    // Check if we're at the last player BEFORE advancing
+    const isLastPlayer = state.currentPlayerIndex === state.players.length - 1;
     nextPlayer();
-    if (state.currentPlayerIndex === state.players.length - 1) nextRound();
+    if (isLastPlayer) nextRound();
   };
 
   const handleSkip = () => {
     setCurrentQuestion(null);
     setSelectedType(null);
     setUseAIFallback(false);
+    // Check if we're at the last player BEFORE advancing
+    const isLastPlayer = state.currentPlayerIndex === state.players.length - 1;
     nextPlayer();
-    if (state.currentPlayerIndex === state.players.length - 1) nextRound();
+    if (isLastPlayer) nextRound();
   };
 
   const getIntensityColor = (intensity: string) => {
@@ -104,9 +108,9 @@ export function GamePlay() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><p className="text-sm text-slate-400 mb-1">Current Player</p><h2 className="text-2xl font-bold text-white">{currentPlayer.name}'s Turn</h2></div>
-        <div className="text-right"><p className="text-sm text-slate-400 mb-1">Round</p><Badge variant="outline" className="text-lg bg-purple-500/20 text-purple-400 border-purple-500/30">#{round}</Badge></div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
+        <div><p className="text-sm text-slate-400 mb-1">Current Player</p><h2 className="text-xl sm:text-2xl font-bold text-white">{currentPlayer.name}'s Turn</h2></div>
+        <div className="text-left sm:text-right"><p className="text-sm text-slate-400 mb-1">Round</p><Badge variant="outline" className="text-base sm:text-lg bg-purple-500/20 text-purple-400 border-purple-500/30">#{state.round}</Badge></div>
       </div>
       {settings.useAI && (
         <div className="flex items-center justify-center">
@@ -151,9 +155,9 @@ export function GamePlay() {
                 </CollapsibleContent>
               </Collapsible>
             )}
-            <div className="flex items-center justify-center gap-4">
-              <Button variant="outline" onClick={handleSkip} className="border-slate-600 text-slate-400 hover:text-white hover:bg-slate-700"><SkipForward className="w-4 h-4 mr-2" /> Skip</Button>
-              <Button onClick={handleComplete} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8"><CheckCircle2 className="w-4 h-4 mr-2" /> Completed</Button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <Button variant="outline" onClick={handleSkip} className="w-full sm:w-auto border-slate-600 text-slate-400 hover:text-white hover:bg-slate-700 active:scale-95"><SkipForward className="w-4 h-4 mr-2" /> Skip</Button>
+              <Button onClick={handleComplete} className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-6 sm:px-8 active:scale-95"><CheckCircle2 className="w-4 h-4 mr-2" /> Completed</Button>
             </div>
           </CardContent>
         </Card>
@@ -162,11 +166,11 @@ export function GamePlay() {
           <CardContent className="p-8">
             <p className="text-center text-slate-400 mb-8">Choose your fate, {currentPlayer.name}...</p>
             <div className="grid grid-cols-2 gap-6">
-              <Button onClick={() => handleGenerate('truth')} disabled={isGenerating} className="h-32 text-xl font-bold bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all hover:scale-105">
-                {isGenerating && selectedType === 'truth' ? <Sparkles className="w-8 h-8 animate-pulse" /> : <><HelpCircle className="w-8 h-8 mr-3" /> TRUTH</>}
+              <Button onClick={() => handleGenerate('truth')} disabled={isGenerating} className="h-24 sm:h-32 text-lg sm:text-xl font-bold bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all hover:scale-105 active:scale-95">
+                {isGenerating && selectedType === 'truth' ? <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" /> : <><HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3" /> <span className="hidden sm:inline">TRUTH</span><span className="sm:hidden">TRUTH</span></>}
               </Button>
-              <Button onClick={() => handleGenerate('dare')} disabled={isGenerating} className="h-32 text-xl font-bold bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all hover:scale-105">
-                {isGenerating && selectedType === 'dare' ? <Sparkles className="w-8 h-8 animate-pulse" /> : <><Zap className="w-8 h-8 mr-3" /> DARE</>}
+              <Button onClick={() => handleGenerate('dare')} disabled={isGenerating} className="h-24 sm:h-32 text-lg sm:text-xl font-bold bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all hover:scale-105 active:scale-95">
+                {isGenerating && selectedType === 'dare' ? <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" /> : <><Zap className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3" /> <span className="hidden sm:inline">DARE</span><span className="sm:hidden">DARE</span></>}
               </Button>
             </div>
           </CardContent>

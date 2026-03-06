@@ -1,5 +1,18 @@
 import type { Player, GameSettings, GeneratedQuestion, QuestionType, IntensityLevel } from '@/types/game';
 
+// Get a unique ID that works across all browsers
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 export const INTENSITY_LABELS: Record<IntensityLevel, string> = {
   mild: 'Mild 🌸',
   medium: 'Medium 🔥',
@@ -139,7 +152,7 @@ export function generateQuestion(
   const personalized = personalizeQuestion(template, player, target);
   
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     type,
     content: personalized.content,
     instructions: personalized.instructions,
