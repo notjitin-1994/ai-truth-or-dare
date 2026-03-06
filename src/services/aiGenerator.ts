@@ -95,7 +95,7 @@ Generate a unique, creative ${type} specifically tailored for ${player.name} to 
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.9,
-      max_tokens: 1500,
+      max_tokens: 10000,
     }),
   });
 

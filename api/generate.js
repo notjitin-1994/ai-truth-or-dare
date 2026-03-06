@@ -46,7 +46,7 @@ export default async function handler(req, res) {
         model: model || 'kimi-for-coding',
         messages,
         temperature: temperature || 0.9,
-        max_tokens: max_tokens || 1500,
+        max_tokens: max_tokens || 10000,
       }),
     });
 
