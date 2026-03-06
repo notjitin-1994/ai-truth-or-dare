@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'kimi-k2-0711-preview', // Official Moonshot model ID
+        model: 'kimi-for-coding', // Kimi Code model ID
         messages: [
           { role: 'user', content: 'Say "Connection successful" and nothing else.' }
         ],

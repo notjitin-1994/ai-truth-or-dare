@@ -60,7 +60,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: model || 'kimi-k2-0711-preview', // Official Moonshot model ID
+        model: model || 'kimi-for-coding', // Kimi Code model ID
         messages,
         temperature: temperature || 0.9,
         max_tokens: max_tokens || 1500,
