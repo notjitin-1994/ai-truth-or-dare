@@ -1,5 +1,6 @@
 // Kimi API Configuration
-export const KIMI_API_URL = 'https://api.kimi.com/v1/chat/completions';
+// Correct endpoint: https://api.moonshot.ai/v1 (Moonshot is Kimi's company)
+export const KIMI_API_URL = 'https://api.moonshot.ai/v1/chat/completions';
 
 // Utility to get API key from various sources
 export function getApiKey() {
