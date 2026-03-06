@@ -21,7 +21,15 @@ export default async function handler(req, res) {
 
   try {
     // Get API key using utility (tries multiple sources)
-    const apiKey = getApiKey();
+    let apiKey = getApiKey();
+    
+    // DEBUG: Log all environment variables to console
+    console.log('=== ENV VAR DEBUG ===');
+    console.log('All env vars:', Object.keys(process.env));
+    console.log('KIMI_API_KEY exists:', !!process.env.KIMI_API_KEY);
+    console.log('KIMI_API_KEY length:', process.env.KIMI_API_KEY?.length);
+    console.log('VERCEL_ENV:', process.env.VERCEL_ENV);
+    console.log('=== END DEBUG ===');
 
     if (!apiKey) {
       const potentialKeys = findPotentialApiKeys();
@@ -34,8 +42,11 @@ export default async function handler(req, res) {
           total_env_vars: Object.keys(process.env).length,
           vercel_env: process.env.VERCEL_ENV,
           node_env: process.env.NODE_ENV,
+          kimi_key_raw_exists: !!process.env.KIMI_API_KEY,
+          kimi_key_raw_type: typeof process.env.KIMI_API_KEY,
         },
-        hint: '1. Go to Vercel Dashboard > Project Settings > Environment Variables\n2. Add KIMI_API_KEY with value starting with sk-kimi-\n3. Make sure Production environment is SELECTED\n4. Click REDEPLOY (not just rebuild)'
+        hint: 'VERCEL_ENV_VAR_BUG: The env var is set in dashboard but not reaching the function. Try:\n1. Go to Project Settings → Environment Variables\n2. DELETE the KIMI_API_KEY completely\n3. Add it back with EXACT name: KIMI_API_KEY\n4. Select ALL environments (Production, Preview, Development)\n5. Click Save\n6. Trigger a NEW deployment (not redeploy)',
+        workaround: 'If this keeps failing, the API key can be temporarily hardcoded for testing (not recommended for production)'
       });
     }
 
