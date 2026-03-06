@@ -1,5 +1,7 @@
 // Kimi API Configuration
-// Correct endpoint: https://api.moonshot.ai/v1 (Moonshot is Kimi's company)
+// Official Moonshot API endpoint (Moonshot is the company behind Kimi)
+// Base URL: https://api.moonshot.ai/v1
+// Docs: https://platform.moonshot.ai/docs/api-reference
 export const KIMI_API_URL = 'https://api.moonshot.ai/v1/chat/completions';
 
 // Utility to get API key from various sources
