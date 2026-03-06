@@ -17,9 +17,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages, model, temperature, max_tokens } = req.body;
-    // Get API key using utility (tries multiple sources)
-    const apiKey = getApiKey();
+    const { messages, model, temperature, max_tokens, apiKey: bodyApiKey } = req.body;
+    
+    // Try multiple sources for API key
+    let apiKey = getApiKey();
+    
+    // DEBUG: Log all attempts
+    console.log('DEBUG: Trying to get API key');
+    console.log('DEBUG: getApiKey result:', apiKey ? 'Found (' + apiKey.length + ' chars)' : 'Not found');
+    console.log('DEBUG: process.env.KIMI_API_KEY:', process.env.KIMI_API_KEY ? 'Exists' : 'Missing');
+    console.log('DEBUG: All env vars:', Object.keys(process.env));
+    
+    // TEMPORARY FALLBACK: Allow API key in request body for testing
+    // WARNING: This is insecure and should only be used for debugging!
+    if (!apiKey && bodyApiKey) {
+      console.log('DEBUG: Using API key from request body (INSECURE - for debugging only)');
+      apiKey = bodyApiKey;
+    }
 
     if (!apiKey) {
       const potentialKeys = findPotentialApiKeys();
@@ -31,13 +45,19 @@ export default async function handler(req, res) {
           total_env_vars: Object.keys(process.env).length,
           vercel_env: process.env.VERCEL_ENV,
           node_env: process.env.NODE_ENV,
+          kimi_key_in_env: 'KIMI_API_KEY' in process.env,
+          all_env_vars: Object.keys(process.env),
         },
         manual_fix_url: 'https://vercel.com/jitin-nairs-projects/ai-truth-or-dare/settings/environment-variables',
         fix_steps: [
-          "Add: KIMI_API_KEY=sk-kimi-vTAdfcInXuPfEl6fblnh76Zr3Zxo2c81XdMgtphZJjFHHeKgmYBWlChFYk7h2fHw",
-          "Environment: Production",
-          "Save and Redeploy"
-        ]
+          "1. Go to Vercel Dashboard > Settings > Environment Variables",
+          "2. Check if KIMI_API_KEY exists (case sensitive!)",
+          "3. If not, add: KIMI_API_KEY=sk-kimi-vTAdfc...",
+          "4. Select: Production",
+          "5. Save and Redeploy (without cache)",
+          "6. Check /api/debug-env to verify"
+        ],
+        temp_workaround: 'For testing only, you can pass apiKey in the request body'
       });
     }
 
