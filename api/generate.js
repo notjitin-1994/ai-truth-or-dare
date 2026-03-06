@@ -1,4 +1,5 @@
 // Vercel Serverless Function for AI generation
+// Kimi API endpoint - using OpenAI-compatible endpoint
 const KIMI_CODE_API_URL = 'https://api.kimi.com/v1/chat/completions';
 
 export default async function handler(req, res) {
@@ -18,10 +19,17 @@ export default async function handler(req, res) {
 
   try {
     const { messages, model, temperature, max_tokens } = req.body;
-    const apiKey = process.env.KIMI_API_KEY;
+    // Trim the API key to handle any accidental whitespace
+    const apiKey = process.env.KIMI_API_KEY?.trim();
 
     if (!apiKey) {
-      return res.status(401).json({ error: 'KIMI_API_KEY environment variable not set' });
+      console.error('KIMI_API_KEY is not set or empty. Available env keys:', 
+        Object.keys(process.env).filter(k => k.includes('KIMI') || k.includes('API'))
+      );
+      return res.status(401).json({ 
+        error: 'KIMI_API_KEY environment variable not set',
+        hint: 'Please set KIMI_API_KEY in your Vercel project settings under Environment Variables'
+      });
     }
 
     const response = await fetch(KIMI_CODE_API_URL, {
