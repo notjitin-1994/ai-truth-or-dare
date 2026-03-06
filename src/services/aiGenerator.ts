@@ -30,9 +30,9 @@ export async function testApiConnection(): Promise<{ success: boolean; message: 
 
     const data = await response.json();
     if (data.success) {
-      return { success: true, message: data.message };
+      return { success: true, message: data.message || 'Connection successful!' };
     } else {
-      return { success: false, message: data.error || data.message || 'Unknown error' };
+      return { success: false, message: data.error || data.message || data.details || 'Connection failed' };
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -89,7 +89,7 @@ Generate a unique, creative ${type} specifically tailored for ${player.name} to 
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'kimi-k2-0711-preview',
+      model: 'kimi-for-coding',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userPrompt }
