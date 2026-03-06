@@ -1,5 +1,15 @@
 // Vercel Serverless Function for AI generation
-import { getApiKey, findPotentialApiKeys, KIMI_API_URL } from './_utils.js';
+import { findPotentialApiKeys, KIMI_API_URL } from './_utils.js';
+
+// Direct env var access - bypass any utility issues
+function getApiKeyDirect() {
+  // Check directly without any utility function
+  const key = process.env.KIMI_API_KEY;
+  console.log('Direct check - KIMI_API_KEY type:', typeof key);
+  console.log('Direct check - KIMI_API_KEY length:', key?.length);
+  console.log('Direct check - KIMI_API_KEY has value:', !!key);
+  return key?.trim() || null;
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -17,23 +27,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages, model, temperature, max_tokens, apiKey: bodyApiKey } = req.body;
+    const { messages, model, temperature, max_tokens } = req.body;
     
-    // Try multiple sources for API key
-    let apiKey = getApiKey();
+    // Direct env var access
+    const apiKey = getApiKeyDirect();
     
-    // DEBUG: Log all attempts
-    console.log('DEBUG: Trying to get API key');
-    console.log('DEBUG: getApiKey result:', apiKey ? 'Found (' + apiKey.length + ' chars)' : 'Not found');
-    console.log('DEBUG: process.env.KIMI_API_KEY:', process.env.KIMI_API_KEY ? 'Exists' : 'Missing');
-    console.log('DEBUG: All env vars:', Object.keys(process.env));
-    
-    // TEMPORARY FALLBACK: Allow API key in request body for testing
-    // WARNING: This is insecure and should only be used for debugging!
-    if (!apiKey && bodyApiKey) {
-      console.log('DEBUG: Using API key from request body (INSECURE - for debugging only)');
-      apiKey = bodyApiKey;
-    }
+    console.log('API Key check result:', apiKey ? 'FOUND' : 'NOT FOUND');
 
     if (!apiKey) {
       const potentialKeys = findPotentialApiKeys();
@@ -42,22 +41,15 @@ export default async function handler(req, res) {
         error: 'KIMI_API_KEY environment variable not set',
         debug: {
           potential_api_keys_found: potentialKeys,
+          direct_check: {
+            'KIMI_API_KEY in process.env': 'KIMI_API_KEY' in process.env,
+            'typeof': typeof process.env.KIMI_API_KEY,
+            'length': process.env.KIMI_API_KEY?.length,
+            'value_preview': process.env.KIMI_API_KEY ? process.env.KIMI_API_KEY.substring(0, 15) + '...' : null,
+          },
           total_env_vars: Object.keys(process.env).length,
-          vercel_env: process.env.VERCEL_ENV,
-          node_env: process.env.NODE_ENV,
-          kimi_key_in_env: 'KIMI_API_KEY' in process.env,
-          all_env_vars: Object.keys(process.env),
         },
-        manual_fix_url: 'https://vercel.com/jitin-nairs-projects/ai-truth-or-dare/settings/environment-variables',
-        fix_steps: [
-          "1. Go to Vercel Dashboard > Settings > Environment Variables",
-          "2. Check if KIMI_API_KEY exists (case sensitive!)",
-          "3. If not, add: KIMI_API_KEY=sk-kimi-vTAdfc...",
-          "4. Select: Production",
-          "5. Save and Redeploy (without cache)",
-          "6. Check /api/debug-env to verify"
-        ],
-        temp_workaround: 'For testing only, you can pass apiKey in the request body'
+        note: 'If debug-env shows the key but this shows null, there is a deployment caching issue. Try force redeploy.'
       });
     }
 
