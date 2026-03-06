@@ -1,15 +1,5 @@
 // Vercel Serverless Function for AI generation
-import { findPotentialApiKeys, KIMI_API_URL } from './_utils.js';
-
-// Direct env var access - bypass any utility issues
-function getApiKeyDirect() {
-  // Check directly without any utility function
-  const key = process.env.KIMI_API_KEY;
-  console.log('Direct check - KIMI_API_KEY type:', typeof key);
-  console.log('Direct check - KIMI_API_KEY length:', key?.length);
-  console.log('Direct check - KIMI_API_KEY has value:', !!key);
-  return key?.trim() || null;
-}
+import { getApiKey, findPotentialApiKeys, KIMI_API_URL, getKimiHeaders } from './_utils.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -29,10 +19,9 @@ export default async function handler(req, res) {
   try {
     const { messages, model, temperature, max_tokens } = req.body;
     
-    // Direct env var access
-    const apiKey = getApiKeyDirect();
+    const apiKey = getApiKey();
     
-    console.log('API Key check result:', apiKey ? 'FOUND' : 'NOT FOUND');
+    console.log('API Key check:', apiKey ? 'Found' : 'Not found');
 
     if (!apiKey) {
       const potentialKeys = findPotentialApiKeys();
@@ -41,26 +30,20 @@ export default async function handler(req, res) {
         error: 'KIMI_API_KEY environment variable not set',
         debug: {
           potential_api_keys_found: potentialKeys,
-          direct_check: {
-            'KIMI_API_KEY in process.env': 'KIMI_API_KEY' in process.env,
-            'typeof': typeof process.env.KIMI_API_KEY,
-            'length': process.env.KIMI_API_KEY?.length,
-            'value_preview': process.env.KIMI_API_KEY ? process.env.KIMI_API_KEY.substring(0, 15) + '...' : null,
-          },
           total_env_vars: Object.keys(process.env).length,
         },
-        note: 'If debug-env shows the key but this shows null, there is a deployment caching issue. Try force redeploy.'
+        hint: 'Add KIMI_API_KEY to Vercel environment variables'
       });
     }
 
+    // Use Kimi-specific headers to identify as coding agent
+    const headers = getKimiHeaders(apiKey);
+    
     const response = await fetch(KIMI_API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
+      headers,
       body: JSON.stringify({
-        model: model || 'kimi-for-coding', // Kimi Code model ID
+        model: model || 'kimi-for-coding',
         messages,
         temperature: temperature || 0.9,
         max_tokens: max_tokens || 1500,

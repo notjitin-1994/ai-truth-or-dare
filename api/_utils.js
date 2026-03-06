@@ -1,27 +1,37 @@
-// Kimi API Configuration
-// Kimi Code API endpoint (from kimi.com/code/console)
-// Base URL: https://api.kimi.com/coding/v1
-// Model: kimi-for-coding
-// Note: This is DIFFERENT from Moonshot's general API (api.moonshot.ai)
+// Kimi Code API Configuration
+// For keys from https://www.kimi.com/code/console
+// Note: Kimi Code requires specific headers to identify as a coding agent
+
 export const KIMI_API_URL = 'https://api.kimi.com/coding/v1/chat/completions';
 
-// Utility to get API key from various sources
+// Headers required to identify as a coding agent (like Claude Code)
+export function getKimiHeaders(apiKey) {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+    // These headers identify us as a coding agent
+    'User-Agent': 'claude-code/0.1.0',
+    'X-Client-Name': 'claude-code',
+    'X-Client-Version': '0.1.0',
+    'Accept': 'application/json',
+  };
+}
+
+// Utility to get API key from environment
 export function getApiKey() {
-  // Try environment variable first (normal case)
-  const envKey = process.env.KIMI_API_KEY?.trim();
-  if (envKey) return envKey;
+  const key = process.env.KIMI_API_KEY?.trim();
+  if (key) return key;
   
-  // Try alternative env var names (sometimes Vercel prefixes or renames)
+  // Try alternatives
   const alternatives = [
     process.env.KIMI_API_KEY,
-    process.env.VERCEL_KIMI_API_KEY,
-    process.env.NEXT_PUBLIC_KIMI_API_KEY,
-    process.env.KIMI_KEY,
-    process.env.OPENAI_API_KEY,
+    process.env.ANTHROPIC_AUTH_TOKEN,
+    process.env.ANTHROPIC_API_KEY,
+    process.env.MOONSHOT_API_KEY,
   ];
   
-  for (const key of alternatives) {
-    if (key?.trim()) return key.trim();
+  for (const k of alternatives) {
+    if (k?.trim()) return k.trim();
   }
   
   return null;
@@ -35,6 +45,8 @@ export function findPotentialApiKeys() {
            lower.includes('api') || 
            lower.includes('key') ||
            lower.includes('secret') ||
-           lower.includes('token');
+           lower.includes('token') ||
+           lower.includes('anthropic') ||
+           lower.includes('moonshot');
   });
 }
