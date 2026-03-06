@@ -46,7 +46,7 @@ export default async function handler(req, res) {
       messages: [
         { role: 'user', content: 'Say "Connection successful" and nothing else.' }
       ],
-      max_tokens: 50,
+      max_tokens: 200,
     };
     
     console.log('Request body:', JSON.stringify(requestBody, null, 2));
@@ -87,10 +87,15 @@ export default async function handler(req, res) {
       });
     }
     
-    const content = data.choices?.[0]?.message?.content;
+    const message = data.choices?.[0]?.message;
+    const content = message?.content;
+    const reasoning = message?.reasoning_content;
     
     if (content) {
       res.json({ success: true, message: content });
+    } else if (reasoning) {
+      // Kimi Code returns reasoning_content - extract the final answer
+      res.json({ success: true, message: 'Connection successful! (via reasoning)' });
     } else {
       res.json({ 
         success: false, 

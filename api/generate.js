@@ -61,6 +61,16 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
+    
+    // Handle Kimi Code's reasoning_content format
+    if (data.choices && data.choices[0]?.message) {
+      const msg = data.choices[0].message;
+      if (!msg.content && msg.reasoning_content) {
+        // If content is empty but reasoning exists, use reasoning as content
+        msg.content = msg.reasoning_content;
+      }
+    }
+    
     res.json(data);
   } catch (error) {
     console.error('Proxy error:', error);
