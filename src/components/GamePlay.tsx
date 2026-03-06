@@ -3,7 +3,7 @@ import { useGame } from '@/hooks/useGameStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { HelpCircle, Zap, SkipForward, CheckCircle2, Flame, Sparkles, History, BookOpen, ChevronDown, ChevronUp, Info, Brain } from 'lucide-react';
+import { HelpCircle, Zap, SkipForward, CheckCircle2, Flame, Sparkles, History, BookOpen, ChevronDown, ChevronUp, Info, Brain, Loader2 } from 'lucide-react';
 import { generateQuestion } from '@/services/questionGenerator';
 import { generateAIQuestion } from '@/services/aiGenerator';
 import type { QuestionType } from '@/types/game';
@@ -106,8 +106,53 @@ export function GamePlay() {
     return <Card className="border-red-500/30 bg-gradient-to-br from-slate-900 to-slate-800"><CardContent className="p-8 text-center"><p className="text-slate-400">No active player found</p></CardContent></Card>;
   }
 
+  // Loading overlay for AI generation
+  const LoadingOverlay = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="relative">
+        {/* Animated rings */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-32 h-32 rounded-full border-2 border-purple-500/30 animate-[spin_3s_linear_infinite]" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-24 h-24 rounded-full border-2 border-pink-500/40 animate-[spin_2s_linear_infinite_reverse]" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full border-2 border-cyan-500/50 animate-[spin_1.5s_linear_infinite]" />
+        </div>
+        
+        {/* Center content */}
+        <div className="relative w-32 h-32 flex flex-col items-center justify-center">
+          <Brain className="w-10 h-10 text-purple-400 animate-pulse mb-2" />
+          <Loader2 className="w-6 h-6 text-pink-400 animate-spin" />
+        </div>
+        
+        {/* Text */}
+        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 whitespace-nowrap">
+          <p className="text-lg font-semibold text-white animate-pulse">
+            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+              AI is crafting
+            </span>
+          </p>
+          <p className="text-sm text-slate-400 text-center mt-1">
+            {selectedType === 'truth' ? 'A provocative question' : 'A daring challenge'}
+          </p>
+        </div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-visible">
+          <div className="absolute top-0 left-1/2 w-1 h-1 bg-purple-400 rounded-full animate-[float_2s_ease-in-out_infinite]" style={{ animationDelay: '0s' }} />
+          <div className="absolute top-1/4 right-0 w-1.5 h-1.5 bg-pink-400 rounded-full animate-[float_2.5s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }} />
+          <div className="absolute bottom-1/4 left-0 w-1 h-1 bg-cyan-400 rounded-full animate-[float_3s_ease-in-out_infinite]" style={{ animationDelay: '0.6s' }} />
+          <div className="absolute bottom-0 right-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full animate-[float_2.2s_ease-in-out_infinite]" style={{ animationDelay: '0.9s' }} />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {isGenerating && settings.useAI && <LoadingOverlay />}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
         <div><p className="text-sm text-slate-400 mb-1">Current Player</p><h2 className="text-xl sm:text-2xl font-bold text-white">{currentPlayer.name}'s Turn</h2></div>
         <div className="text-left sm:text-right"><p className="text-sm text-slate-400 mb-1">Round</p><Badge variant="outline" className="text-base sm:text-lg bg-purple-500/20 text-purple-400 border-purple-500/30">#{state.round}</Badge></div>
