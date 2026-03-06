@@ -32,7 +32,12 @@ export default async function handler(req, res) {
           vercel_env: process.env.VERCEL_ENV,
           node_env: process.env.NODE_ENV,
         },
-        hint: '1. Go to Vercel Dashboard > Project Settings > Environment Variables\n2. Add KIMI_API_KEY with value starting with sk-kimi-\n3. Make sure Production environment is SELECTED\n4. Click REDEPLOY (not just rebuild)'
+        manual_fix_url: 'https://vercel.com/jitin-nairs-projects/ai-truth-or-dare/settings/environment-variables',
+        fix_steps: [
+          "Add: KIMI_API_KEY=sk-kimi-vTAdfcInXuPfEl6fblnh76Zr3Zxo2c81XdMgtphZJjFHHeKgmYBWlChFYk7h2fHw",
+          "Environment: Production",
+          "Save and Redeploy"
+        ]
       });
     }
 

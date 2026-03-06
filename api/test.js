@@ -43,8 +43,19 @@ export default async function handler(req, res) {
           kimi_key_raw_exists: !!process.env.KIMI_API_KEY,
           kimi_key_raw_type: typeof process.env.KIMI_API_KEY,
         },
-        hint: 'VERCEL_ENV_VAR_BUG: The env var is set in dashboard but not reaching the function. Try:\n1. Go to Project Settings → Environment Variables\n2. DELETE the KIMI_API_KEY completely\n3. Add it back with EXACT name: KIMI_API_KEY\n4. Select ALL environments (Production, Preview, Development)\n5. Click Save\n6. Trigger a NEW deployment (not redeploy)',
-        workaround: 'If this keeps failing, the API key can be temporarily hardcoded for testing (not recommended for production)'
+        manual_fix_steps: [
+          "1. Go to https://vercel.com/jitin-nairs-projects/ai-truth-or-dare/settings/environment-variables",
+          "2. Click 'Add' button",
+          "3. Name: KIMI_API_KEY",
+          "4. Value: sk-kimi-vTAdfcInXuPfEl6fblnh76Zr3Zxo2c81XdMgtphZJjFHHeKgmYBWlChFYk7h2fHw",
+          "5. Environment: Select ONLY 'Production' (uncheck others)",
+          "6. Click 'Save'",
+          "7. Go to Deployments tab",
+          "8. Click three dots [...] on latest deployment",
+          "9. Click 'Redeploy' and select 'Use existing Build Cache: NO'",
+          "10. Wait for redeploy to complete"
+        ],
+        note: 'Vercel CLI is timing out. Please use the Dashboard to set the env var manually.'
       });
     }
 
